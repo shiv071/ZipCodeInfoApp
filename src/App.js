@@ -1,25 +1,46 @@
-import logo from './logo.svg';
+import React, { useState} from 'react';
+import PostalCodeForm from './components/PostalCodeForm';
+import LocationInfo from './components/LocationInfo';
 import './App.css';
 
-function App() {
+const App = () => {
+  const [locationData, setLocationData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const clearData = () => {
+    setLocationData(null);
+  };
+
+  const fetchLocationData = (postalCode) => {
+    setLoading(true);
+    setError(null);
+
+    fetch(`https://api.zippopotam.us/in/${postalCode}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setLocationData(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error);
+        setLoading(false);
+      });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='container'>
+      <h1>Postal Code Location Finder</h1>
+      <PostalCodeForm onSearch={fetchLocationData} />
+      <LocationInfo
+        locationData={locationData}
+        clearData={clearData}
+        loading={loading}
+        error={error}
+      />
     </div>
   );
-}
+};
 
 export default App;
+
